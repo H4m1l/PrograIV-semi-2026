@@ -9,8 +9,12 @@ createApp({
                 codigo: "",
                 nombre: "",
                 direccion: "",
-                email: "",
-                telefono: ""
+                municipio: "",
+                departamento: "",
+                telefono: "",
+                fechaNacimiento: "",
+                sexo: "",
+                email: ""
             },
             buscar: "",
             alumnos: []
@@ -22,14 +26,16 @@ createApp({
             this.alumnos = [];
             for (let i = 0; i < n; i++) {
                 let key = localStorage.key(i);
-                // Validamos que la clave sea un número (nuestros IDs) para evitar errores con otros datos en localStorage
                 if (!isNaN(Number(key))) {
-                    let data = JSON.parse(localStorage.getItem(key));
-
-                    if (data.nombre.toUpperCase().includes(this.buscar.toUpperCase()) ||
-                        data.codigo.toUpperCase().includes(this.buscar.toUpperCase())) {
-                        this.alumnos.push(data);
-
+                    try {
+                        let data = JSON.parse(localStorage.getItem(key));
+                       
+                        if (data.nombre.toUpperCase().includes(this.buscar.toUpperCase()) ||
+                            data.codigo.toUpperCase().includes(this.buscar.toUpperCase())) {
+                            this.alumnos.push(data);
+                        }
+                    } catch (e) {
+                        console.error("Error reading key: " + key, e);
                     }
                 }
             }
@@ -44,11 +50,8 @@ createApp({
         modificarAlumno(alumno) {
             this.accion = "Modificar";
             this.id = alumno.id;
-            this.alumno.codigo = alumno.codigo;
-            this.alumno.nombre = alumno.nombre;
-            this.alumno.direccion = alumno.direccion;
-            this.alumno.email = alumno.email;
-            this.alumno.telefono = alumno.telefono;
+           
+            this.alumno = { ...alumno };
         },
         guardarAlumno() {
             let datos = {
@@ -56,13 +59,20 @@ createApp({
                 codigo: this.alumno.codigo,
                 nombre: this.alumno.nombre,
                 direccion: this.alumno.direccion,
-                email: this.alumno.email,
-                telefono: this.alumno.telefono
-            }, codigoDuplicado = this.buscarAlumno(datos.codigo);
+                municipio: this.alumno.municipio,
+                departamento: this.alumno.departamento,
+                telefono: this.alumno.telefono,
+                fechaNacimiento: this.alumno.fechaNacimiento,
+                sexo: this.alumno.sexo,
+                email: this.alumno.email
+            };
+
+            let codigoDuplicado = this.buscarAlumno(datos.codigo);
             if (codigoDuplicado && this.accion == "Nuevo") {
-                alert("El codigo del alumno ya existe, " + codigoDuplicado.nombre);
-                return; //Termina la ejecucion de la funcion
+                alert("El código del alumno ya existe, pertenece a: " + codigoDuplicado.nombre);
+                return;
             }
+
             localStorage.setItem(datos.id, JSON.stringify(datos));
             this.limpiarFormulario();
             this.obtenerAlumnos();
@@ -73,17 +83,23 @@ createApp({
         limpiarFormulario() {
             this.accion = "Nuevo";
             this.id = 0;
-            this.alumno.codigo = "";
-            this.alumno.nombre = "";
-            this.alumno.direccion = "";
-            this.alumno.email = "";
-            this.alumno.telefono = "";
+            this.alumno = {
+                codigo: "",
+                nombre: "",
+                direccion: "",
+                municipio: "",
+                departamento: "",
+                telefono: "",
+                fechaNacimiento: "",
+                sexo: "",
+                email: ""
+            };
         },
         buscarAlumno(codigo = '') {
             let n = localStorage.length;
             for (let i = 0; i < n; i++) {
                 let key = localStorage.key(i);
-                if (!isNaN(Number(key))) { // Solo buscamos en nuestras llaves numéricas
+                if (!isNaN(Number(key))) {
                     try {
                         let datos = JSON.parse(localStorage.getItem(key));
                         if (datos?.codigo && datos.codigo.trim().toUpperCase() == codigo.trim().toUpperCase()) {
