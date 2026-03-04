@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>::.. SISTEMA DE BIBLIOTECA ..::</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css" />
+    <!-- Default theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css" />
+    <!-- Semantic UI theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/semantic.min.css" />
+    <link rel="stylesheet" href="biblioteca.css" />
+</head>
+
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">::.. SISTEMA DE BIBLIOTECA ..::</a>
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="navbar-nav">
+                        <a class="nav-link" href="#" @click="abrirVentana('autores')">Autores</a>
+                        <a class="nav-link" href="#" @click="abrirVentana('libros')">Libros</a>
+                        <a class="nav-link" href="index.html">Ir a Sistema Académico</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div id="appSistema" class="container-fluid mt-3">
+            <autores @buscar='buscar("busqueda_autores","obtenerAutores")' :forms="forms" ref="autores"
+                v-show="forms.autores.mostrar"></autores>
+            <busqueda_autores @modificar='modificar("autores","modificarAutor", $event)' ref="busqueda_autores"
+                v-show="forms.busqueda_autores.mostrar"></busqueda_autores>
+
+            <libros @buscar='buscar("busqueda_libros","obtenerLibros")' :forms="forms" ref="libros"
+                v-show="forms.libros.mostrar"></libros>
+            <busqueda_libros @modificar='modificar("libros","modificarLibro", $event)' ref="busqueda_libros"
+                v-show="forms.busqueda_libros.mostrar"></busqueda_libros>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dexie/4.2.0/dexie.min.js"
+        integrity="sha512-LuXLH9xON6/aAGYxi4Z1Dx8588Z80gY3iMmGtUlYmblUc1ulC/cGHuANXIvm8fnIWp5ShUk2MRBIWylGguXF9g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="componentes/autores.js"></script>
+    <script src="componentes/busqueda_autores.js"></script>
+    <script src="componentes/libros.js"></script>
+    <script src="componentes/busqueda_libros.js"></script>
+    <script src="main_biblioteca.js"></script>
+</body>
+
+</html>
