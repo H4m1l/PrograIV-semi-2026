@@ -63,4 +63,4 @@ const busqueda_docentes = {
             </div>
         </div>
     `
-}; 
+};

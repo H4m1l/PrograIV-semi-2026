@@ -101,4 +101,4 @@ const materias = {
             </div>
         </div>
     `
-}; 
+};
