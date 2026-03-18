@@ -143,4 +143,4 @@ const docentes = {
             </div>
         </div>
     `
-};
+}; 

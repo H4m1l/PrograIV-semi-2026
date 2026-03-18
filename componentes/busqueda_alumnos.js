@@ -76,4 +76,4 @@ const busqueda_alumnos = {
             </div>
         </div>
     `
-};
+}; 

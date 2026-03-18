@@ -21,3 +21,4 @@ class DB{
         return $this->consulta->fetchAll(PDO::FETCH_ASSOC);
     }
 }
+ 
