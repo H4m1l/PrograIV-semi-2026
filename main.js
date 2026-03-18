@@ -45,4 +45,4 @@ createApp({
             "docentes": "idDocente, codigo, nombre, direccion, email, telefono, escalafon"
         });
     }
-}).mount("#app");
+}).mount("#app"); 
