@@ -20,7 +20,7 @@ const docentes = {
         buscarDocente(){
             this.forms.busqueda_docentes.mostrar = !this.forms.busqueda_docentes.mostrar;
             this.$emit('buscar');
-        },
+        }, 
         modificarDocente(docente){
             this.accion = 'modificar';
             this.idDocente = docente.idDocente;
