@@ -1,4 +1,6 @@
-const busqueda_alumnos = {
+import { getDB } from '../db.js';
+
+export const busqueda_alumnos = {
     data(){
         return{
             buscar:'',
@@ -10,28 +12,34 @@ const busqueda_alumnos = {
             this.$emit('modificar', alumno);
         },
         async obtenerAlumnos(){
-            this.alumnos = await db.alumnos.filter(
-                alumno => alumno.codigo.toLowerCase().includes(this.buscar.toLowerCase()) 
-                    || alumno.nombre.toLowerCase().includes(this.buscar.toLowerCase())
-            ).toArray();
-            if( this.alumnos.length<1 && this.buscar.length<=0){
-                fetch(`private/modulos/alumnos/alumno.php?accion=consultar`)
-                    .then(response=>response.json())
-                    .then(data=>{
-                        this.alumnos = data;
-                        db.alumnos.bulkAdd(data);
-                    });
+            const db = await getDB();
+            let query = "SELECT * FROM alumnos";
+            let binds = [];
+            
+            if (this.buscar.trim() !== '') {
+                query += " WHERE lower(codigo) LIKE ? OR lower(nombre) LIKE ?";
+                const likeStr = '%' + this.buscar.toLowerCase() + '%';
+                binds = [likeStr, likeStr];
             }
+            query += " ORDER BY nombre ASC";
+            
+            const results = [];
+            db.exec({
+                sql: query,
+                bind: binds,
+                rowMode: 'object',
+                callback: (row) => results.push(row)
+            });
+            this.alumnos = results;
         },
         async eliminarAlumno(alumno, e){
             e.stopPropagation();
             alertify.confirm('Elimanar alumnos', `¿Está seguro de eliminar el alumno ${alumno.nombre}?`, async e=>{
-                await db.alumnos.delete(alumno.idAlumno);
-                fetch(`private/modulos/alumnos/alumno.php?accion=eliminar&alumnos=${JSON.stringify(alumno)}`)
-                    .then(response=>response.json())
-                    .then(data=>{
-                        if(data!=true) alertify.error(`Error al sincronizar con el servidor: ${data}`);
-                    });
+                const db = await getDB();
+                db.exec({
+                    sql: "DELETE FROM alumnos WHERE idAlumno = ?",
+                    bind: [alumno.idAlumno]
+                });
                 this.obtenerAlumnos();
                 alertify.success(`Alumno ${alumno.nombre} eliminado correctamente`);
             }, () => {

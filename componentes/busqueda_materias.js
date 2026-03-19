@@ -1,4 +1,6 @@
-const busqueda_materias = {
+import { getDB } from '../db.js';
+
+export const busqueda_materias = {
     data(){
         return{
             buscar:'',
@@ -10,28 +12,34 @@ const busqueda_materias = {
             this.$emit('modificar', materia);
         },
         async obtenerMaterias(){
-            this.materias = await db.materias.orderBy('codigo').filter(
-                materia => materia.codigo.toLowerCase().includes(this.buscar.toLowerCase()) 
-                    || materia.nombre.toLowerCase().includes(this.buscar.toLowerCase())
-            ).toArray();
-            if( this.materias.length<1 && this.buscar.length<=0){
-                fetch(`private/modulos/materias/materia.php?accion=consultar`)
-                    .then(response=>response.json())
-                    .then(data=>{
-                        this.materias = data;
-                        db.materias.bulkAdd(data);
-                    });
+            const db = await getDB();
+            let query = "SELECT * FROM materias";
+            let binds = [];
+            
+            if (this.buscar.trim() !== '') {
+                query += " WHERE lower(codigo) LIKE ? OR lower(nombre) LIKE ?";
+                const likeStr = '%' + this.buscar.toLowerCase() + '%';
+                binds = [likeStr, likeStr];
             }
+            query += " ORDER BY codigo ASC";
+            
+            const results = [];
+            db.exec({
+                sql: query,
+                bind: binds,
+                rowMode: 'object',
+                callback: (row) => results.push(row)
+            });
+            this.materias = results;
         },
         async eliminarMateria(materia, e){
             e.stopPropagation();
             alertify.confirm('Eliminar materias', `¿Está seguro de eliminar el materia ${materia.nombre}?`, async e=>{
-                await db.materias.delete(materia.idMateria);
-                fetch(`private/modulos/materias/materia.php?accion=eliminar&materias=${JSON.stringify(materia)}`)
-                    .then(response=>response.json())
-                    .then(data=>{
-                        if(data!=true) alertify.error(`Error al sincronizar con el servidor: ${data}`);
-                    });
+                const db = await getDB();
+                db.exec({
+                    sql: "DELETE FROM materias WHERE idMateria = ?",
+                    bind: [materia.idMateria]
+                });
                 this.obtenerMaterias();
                 alertify.success(`Materia ${materia.nombre} eliminada correctamente`);
             }, () => {

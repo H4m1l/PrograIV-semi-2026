@@ -1,4 +1,6 @@
-const busqueda_docentes = {
+import { getDB } from '../db.js';
+
+export const busqueda_docentes = {
     data(){
         return{
             buscar:'',
@@ -10,15 +12,34 @@ const busqueda_docentes = {
             this.$emit('modificar', docente);
         },
         async obtenerDocentes(){
-            this.docentes = await db.docentes.filter(
-                docente => docente.codigo.toLowerCase().includes(this.buscar.toLowerCase()) 
-                    || docente.nombre.toLowerCase().includes(this.buscar.toLowerCase())
-            ).toArray();
+            const db = await getDB();
+            let query = "SELECT * FROM docentes";
+            let binds = [];
+            
+            if (this.buscar.trim() !== '') {
+                query += " WHERE lower(codigo) LIKE ? OR lower(nombre) LIKE ?";
+                const likeStr = '%' + this.buscar.toLowerCase() + '%';
+                binds = [likeStr, likeStr];
+            }
+            query += " ORDER BY nombre ASC";
+            
+            const results = [];
+            db.exec({
+                sql: query,
+                bind: binds,
+                rowMode: 'object',
+                callback: (row) => results.push(row)
+            });
+            this.docentes = results;
         },
         async eliminarDocente(docente, e){
             e.stopPropagation();
             alertify.confirm('Elimanar docentes', `¿Está seguro de eliminar el docente ${docente.nombre}?`, async e=>{
-                await db.docentes.delete(docente.idDocente);
+                const db = await getDB();
+                db.exec({
+                    sql: "DELETE FROM docentes WHERE idDocente = ?",
+                    bind: [docente.idDocente]
+                });
                 this.obtenerDocentes();
                 alertify.success(`Docente ${docente.nombre} eliminado correctamente`);
             }, () => {

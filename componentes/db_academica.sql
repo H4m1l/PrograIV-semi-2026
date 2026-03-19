@@ -59,6 +59,20 @@ ALTER TABLE `alumnos`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
+--
+-- Table structure for table `inscripciones`
+--
+
+CREATE TABLE IF NOT EXISTS `inscripciones` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `idInscripcion` char(36) NOT NULL,
+  `idAlumno` char(36) NOT NULL,
+  `idMateria` char(36) NOT NULL,
+  `fecha` date NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idInscripcion` (`idInscripcion`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

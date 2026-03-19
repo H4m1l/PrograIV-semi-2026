@@ -1,4 +1,6 @@
-const materias = {
+import { getDB } from '../db.js';
+
+export const materias = {
     props:['forms'],
     data(){
         return{
@@ -33,24 +35,33 @@ const materias = {
                 uv: this.materia.uv,
             };
             this.buscar = datos.codigo;
-            //await this.obtenerMaterias();
 
-            if(this.data_materias.length > 0 && this.accion=='nuevo'){
+            if(this.data_materias && this.data_materias.length > 0 && this.accion=='nuevo'){
                 alertify.error(`El codigo del materia ya existe, ${this.data_materias[0].nombre}`);
-                return; //Termina la ejecucion de la funcion
+                return;
             }
-            db.materias.put(datos);
-            fetch(`private/modulos/materias/materia.php?accion=${this.accion}&materias=${JSON.stringify(datos)}`)
-                .then(response=>response.json())
-                .then(data=>{
-                    if(data!=true) alertify.error(`Error al sincronizar con el servidor: ${data}`);
-                });
-            this.limpiarFormulario();
-            //this.obtenerMaterias();
-            alertify.success(`Materia ${datos.nombre} guardada correctamente`);
+            try {
+                const db = await getDB();
+                if (this.accion == 'modificar') {
+                    db.exec({
+                        sql: "UPDATE materias SET codigo = ?, nombre = ?, uv = ? WHERE idMateria = ?",
+                        bind: [datos.codigo, datos.nombre, datos.uv, datos.idMateria]
+                    });
+                } else {
+                    db.exec({
+                        sql: "INSERT INTO materias (idMateria, codigo, nombre, uv) VALUES (?, ?, ?, ?)",
+                        bind: [datos.idMateria, datos.codigo, datos.nombre, datos.uv]
+                    });
+                }
+                this.limpiarFormulario();
+                alertify.success(`Materia ${datos.nombre} guardada correctamente localmente`);
+            } catch (err) {
+                console.error("Error guardando materia:", err);
+                alertify.error("Error guardando materia: " + err.message);
+            }
         },
         getId(){
-            return uuid.v4();
+            return new Date().getTime();
         },
         limpiarFormulario(){
             this.accion = 'nuevo';

@@ -1,4 +1,7 @@
-const alumnos = {
+// componentes/alumnos.js
+import { getDB } from '../db.js';
+
+export const alumnos = {
     props:['forms'],
     data(){
         return{
@@ -11,7 +14,6 @@ const alumnos = {
                 telefono:""
             },
             accion:'nuevo',
-            idAlumno:0,
             data_alumnos:[]
         }
     },
@@ -22,7 +24,7 @@ const alumnos = {
         },
         modificarAlumno(alumno){
             this.accion = 'modificar';
-            this.idAlumno = alumno.idAlumno;
+            this.alumno.idAlumno = alumno.idAlumno;
             this.alumno.codigo = alumno.codigo;
             this.alumno.nombre = alumno.nombre;
             this.alumno.direccion = alumno.direccion;
@@ -31,37 +33,43 @@ const alumnos = {
         },
         async guardarAlumno() {
             let datos = {
-                idAlumno: this.accion=='modificar' ? this.idAlumno : this.getId(),
+                idAlumno: this.accion=='modificar' ? this.alumno.idAlumno : this.getId(),
                 codigo: this.alumno.codigo,
                 nombre: this.alumno.nombre,
                 direccion: this.alumno.direccion,
                 email: this.alumno.email,
                 telefono: this.alumno.telefono
             };
-            //datos.hash = sha256(JSON.stringify(datos));
-            this.buscar = datos.codigo;
-            //await this.obtenerAlumnos();
-
-            if(this.data_alumnos.length > 0 && this.accion=='nuevo'){
-                alertify.error(`El codigo del alumno ya existe, ${this.data_alumnos[0].nombre}`);
-                return; //Termina la ejecucion de la funcion
+            
+            try {
+                const db = await getDB();
+                
+                if (this.accion == 'modificar') {
+                    db.exec({
+                        sql: "UPDATE alumnos SET codigo = ?, nombre = ?, direccion = ?, email = ?, telefono = ? WHERE idAlumno = ?",
+                        bind: [datos.codigo, datos.nombre, datos.direccion, datos.email, datos.telefono, datos.idAlumno]
+                    });
+                    alertify.success(`${datos.nombre} actulizado correctamente en local.`);
+                } else {
+                    db.exec({
+                        sql: "INSERT INTO alumnos (idAlumno, codigo, nombre, direccion, email, telefono) VALUES (?, ?, ?, ?, ?, ?)",
+                        bind: [datos.idAlumno, datos.codigo, datos.nombre, datos.direccion, datos.email, datos.telefono]
+                    });
+                    alertify.success(`${datos.nombre} guardado correctamente en local.`);
+                }
+                
+                this.limpiarFormulario();
+            } catch (error) {
+                console.error("Error intentando guardar alumno:", error);
+                alertify.error(`Error al guardar: ${error.message}`);
             }
-            db.alumnos.put(datos);
-            fetch(`private/modulos/alumnos/alumno.php?accion=${this.accion}&alumnos=${JSON.stringify(datos)}`)
-                .then(response=>response.json())
-                .then(data=>{
-                    if(data!=true) alertify.error(`Error al sincronizar con el servidor: ${data}`);
-                });
-            this.limpiarFormulario();
-            alertify.success(`${datos.nombre} guardado correctamente`);
-            //this.obtenerAlumnos();
         },
         getId(){
-            return uuid.v4();
+            return new Date().getTime();
         },
         limpiarFormulario(){
             this.accion = 'nuevo';
-            this.idAlumno = 0;
+            this.alumno.idAlumno = 0;
             this.alumno.codigo = '';
             this.alumno.nombre = '';
             this.alumno.direccion = '';
@@ -131,4 +139,4 @@ const alumnos = {
             </div>
         </div>
     `
-};
+}; 
