@@ -1,4 +1,6 @@
-const docentes = {
+import { getDB } from '../db.js';
+
+export const docentes = {
     props:['forms'],
     data(){
         return{
@@ -42,16 +44,30 @@ const docentes = {
                 escalafon: this.docente.escalafon
             };
             this.buscar = datos.codigo;
-            //await this.obtenerDocentes();
 
-            if(this.data_docentes.length > 0 && this.accion=='nuevo'){
+            if(this.data_docentes && this.data_docentes.length > 0 && this.accion=='nuevo'){
                 alertify.error(`El codigo del docente ya existe, ${this.data_docentes[0].nombre}`);
-                return; //Termina la ejecucion de la funcion
+                return;
             }
-            db.docentes.put(datos);
-            this.limpiarFormulario();
-            alertify.success(`${datos.nombre} guardado correctamente`);
-            //this.obtenerDocentes();
+            try {
+                const db = await getDB();
+                if (this.accion == 'modificar') {
+                    db.exec({
+                        sql: "UPDATE docentes SET codigo = ?, nombre = ?, direccion = ?, email = ?, telefono = ?, escalafon = ? WHERE idDocente = ?",
+                        bind: [datos.codigo, datos.nombre, datos.direccion, datos.email, datos.telefono, datos.escalafon, datos.idDocente]
+                    });
+                } else {
+                    db.exec({
+                        sql: "INSERT INTO docentes (idDocente, codigo, nombre, direccion, email, telefono, escalafon) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        bind: [datos.idDocente, datos.codigo, datos.nombre, datos.direccion, datos.email, datos.telefono, datos.escalafon]
+                    });
+                }
+                this.limpiarFormulario();
+                alertify.success(`${datos.nombre} guardado correctamente`);
+            } catch (err) {
+                console.error("Error guardando docente:", err);
+                alertify.error("Error guardando docente: " + err.message);
+            }
         },
         getId(){
             return new Date().getTime();
