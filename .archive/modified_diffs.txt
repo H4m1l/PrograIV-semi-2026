@@ -1,0 +1,863 @@
+﻿diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\.env" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\.env"
+index 6246c96..1dacfd8 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\.env"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\.env"
+@@ -1,10 +1,22 @@
+ APP_NAME=Laravel
+ APP_ENV=local
+-APP_KEY=base64:AJ83M3PFtFAC5+WEmCfOQkVYn66sTMBSd1okEzOchzM=
++APP_KEY=base64:N5ROObv2vDGCs3FXa+hMPXmgxVTtdJ4M2fJQuc1urA8=
+ APP_DEBUG=true
+ APP_URL=http://localhost
+ 
++APP_LOCALE=en
++APP_FALLBACK_LOCALE=en
++APP_FAKER_LOCALE=en_US
++
++APP_MAINTENANCE_DRIVER=file
++# APP_MAINTENANCE_STORE=database
++
++# PHP_CLI_SERVER_WORKERS=4
++
++BCRYPT_ROUNDS=12
++
+ LOG_CHANNEL=stack
++LOG_STACK=single
+ LOG_DEPRECATIONS_CHANNEL=null
+ LOG_LEVEL=debug
+ 
+@@ -15,25 +27,32 @@ DB_DATABASE=db_academica
+ DB_USERNAME=root
+ DB_PASSWORD=
+ 
+-BROADCAST_DRIVER=log
+-CACHE_DRIVER=file
+-FILESYSTEM_DISK=local
+-QUEUE_CONNECTION=sync
+-SESSION_DRIVER=file
++SESSION_DRIVER=database
+ SESSION_LIFETIME=120
++SESSION_ENCRYPT=false 
++SESSION_PATH=/
++SESSION_DOMAIN=null
++
++BROADCAST_CONNECTION=log
++FILESYSTEM_DISK=local
++QUEUE_CONNECTION=database
++
++CACHE_STORE=database
++# CACHE_PREFIX=
+ 
+ MEMCACHED_HOST=127.0.0.1
+ 
++REDIS_CLIENT=phpredis
+ REDIS_HOST=127.0.0.1
+ REDIS_PASSWORD=null
+ REDIS_PORT=6379
+ 
+-MAIL_MAILER=smtp
+-MAIL_HOST=mailpit
+-MAIL_PORT=1025
++MAIL_MAILER=log
++MAIL_SCHEME=null
++MAIL_HOST=127.0.0.1
++MAIL_PORT=2525
+ MAIL_USERNAME=null
+ MAIL_PASSWORD=null
+-MAIL_ENCRYPTION=null
+ MAIL_FROM_ADDRESS="hello@example.com"
+ MAIL_FROM_NAME="${APP_NAME}"
+ 
+@@ -43,17 +62,4 @@ AWS_DEFAULT_REGION=us-east-1
+ AWS_BUCKET=
+ AWS_USE_PATH_STYLE_ENDPOINT=false
+ 
+-PUSHER_APP_ID=
+-PUSHER_APP_KEY=
+-PUSHER_APP_SECRET=
+-PUSHER_HOST=
+-PUSHER_PORT=443
+-PUSHER_SCHEME=https
+-PUSHER_APP_CLUSTER=mt1
+-
+ VITE_APP_NAME="${APP_NAME}"
+-VITE_PUSHER_APP_KEY="${PUSHER_APP_KEY}"
+-VITE_PUSHER_HOST="${PUSHER_HOST}"
+-VITE_PUSHER_PORT="${PUSHER_PORT}"
+-VITE_PUSHER_SCHEME="${PUSHER_SCHEME}"
+-VITE_PUSHER_APP_CLUSTER="${PUSHER_APP_CLUSTER}"
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\package.json" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\package.json"
+index 8469ce2..7686b29 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\package.json"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\package.json"
+@@ -1,25 +1,17 @@
+ {
++    "$schema": "https://www.schemastore.org/package.json",
+     "private": true,
++    "type": "module",
+     "scripts": {
+-        "dev": "vite",
+-        "build": "vite build"
++        "build": "vite build",
++        "dev": "vite"
+     },
+     "devDependencies": {
+-        "@popperjs/core": "^2.11.6",
+-        "@vitejs/plugin-vue": "^6.0.7",
+-        "axios": "^1.15.1",
+-        "bootstrap": "^5.2.3",
+-        "laravel-vite-plugin": "^1.0.0",
+-        "sass": "^1.56.1",
+-        "vite": "^8.0.13",
+-        "vue": "^3.2.37"
+-    },
+-    "dependencies": {
+-        "alertifyjs": "^1.14.0",
+-        "crypto": "^1.0.1",
+-        "dexie": "^4.4.2",
+-        "mongodb": "^7.2.0",
+-        "socket.io": "^4.8.3",
+-        "uuid": "^14.0.0"
++        "@tailwindcss/vite": "^4.0.0",
++        "axios": "^1.11.0",
++        "concurrently": "^9.0.1",
++        "laravel-vite-plugin": "^2.0.0",
++        "tailwindcss": "^4.0.0",
++        "vite": "^7.0.7"
+     }
+ }
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\vite.config.js" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\vite.config.js"
+index a36b23a..f35b4e7 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\vite.config.js"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\vite.config.js"
+@@ -1,28 +1,18 @@
+ import { defineConfig } from 'vite';
+ import laravel from 'laravel-vite-plugin';
+-import vue from '@vitejs/plugin-vue';
++import tailwindcss from '@tailwindcss/vite';
+ 
+ export default defineConfig({
+     plugins: [
+         laravel({
+-            input: [
+-                'resources/sass/app.scss',
+-                'resources/js/app.js',
+-            ],
++            input: ['resources/css/app.css', 'resources/js/app.js'],
+             refresh: true,
+         }),
+-        vue({
+-            template: {
+-                transformAssetUrls: {
+-                    base: null,
+-                    includeAbsolute: false,
+-                },
+-            },
+-        }),
++        tailwindcss(),
+     ],
+-    resolve: {
+-        alias: {
+-            vue: 'vue/dist/vue.esm-bundler.js',
++    server: {
++        watch: {
++            ignored: ['**/storage/framework/views/**'],
+         },
+     },
+ });
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\app\\Http\\Controllers\\Controller.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\app\\Http\\Controllers\\Controller.php"
+index 77ec359..8677cd5 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\app\\Http\\Controllers\\Controller.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\app\\Http\\Controllers\\Controller.php"
+@@ -2,11 +2,7 @@
+ 
+ namespace App\Http\Controllers;
+ 
+-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+-use Illuminate\Foundation\Validation\ValidatesRequests;
+-use Illuminate\Routing\Controller as BaseController;
+-
+-class Controller extends BaseController
++abstract class Controller
+ {
+-    use AuthorizesRequests, ValidatesRequests;
++    //
+ }
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\app\\Models\\User.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\app\\Models\\User.php"
+index 4d7f70f..68f3a66 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\app\\Models\\User.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\app\\Models\\User.php"
+@@ -3,19 +3,20 @@
+ namespace App\Models;
+ 
+ // use Illuminate\Contracts\Auth\MustVerifyEmail;
++use Database\Factories\UserFactory;
+ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Foundation\Auth\User as Authenticatable;
+ use Illuminate\Notifications\Notifiable;
+-use Laravel\Sanctum\HasApiTokens;
+ 
+ class User extends Authenticatable
+ {
+-    use HasApiTokens, HasFactory, Notifiable;
++    /** @use HasFactory<UserFactory> */
++    use HasFactory, Notifiable;
+ 
+     /**
+      * The attributes that are mass assignable.
+      *
+-     * @var array<int, string>
++     * @var list<string>
+      */
+     protected $fillable = [
+         'name',
+@@ -26,7 +27,7 @@ class User extends Authenticatable
+     /**
+      * The attributes that should be hidden for serialization.
+      *
+-     * @var array<int, string>
++     * @var list<string>
+      */
+     protected $hidden = [
+         'password',
+@@ -34,12 +35,15 @@ class User extends Authenticatable
+     ];
+ 
+     /**
+-     * The attributes that should be cast.
++     * Get the attributes that should be cast.
+      *
+-     * @var array<string, string>
++     * @return array<string, string>
+      */
+-    protected $casts = [
+-        'email_verified_at' => 'datetime',
+-        'password' => 'hashed',
+-    ];
++    protected function casts(): array
++    {
++        return [
++            'email_verified_at' => 'datetime',
++            'password' => 'hashed',
++        ];
++    }
+ }
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\bootstrap\\app.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\bootstrap\\app.php"
+index 037e17d..f13b692 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\bootstrap\\app.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\bootstrap\\app.php"
+@@ -1,55 +1,19 @@
+ <?php
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Create The Application
+-|--------------------------------------------------------------------------
+-|
+-| The first thing we will do is create a new Laravel application instance
+-| which serves as the "glue" for all the components of Laravel, and is
+-| the IoC container for the system binding all of the various parts.
+-|
+-*/
+-
+-$app = new Illuminate\Foundation\Application(
+-    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
+-);
+-
+-/*
+-|--------------------------------------------------------------------------
+-| Bind Important Interfaces
+-|--------------------------------------------------------------------------
+-|
+-| Next, we need to bind some important interfaces into the container so
+-| we will be able to resolve them when needed. The kernels serve the
+-| incoming requests to this application from both the web and CLI.
+-|
+-*/
+-
+-$app->singleton(
+-    Illuminate\Contracts\Http\Kernel::class,
+-    App\Http\Kernel::class
+-);
+-
+-$app->singleton(
+-    Illuminate\Contracts\Console\Kernel::class,
+-    App\Console\Kernel::class
+-);
+-
+-$app->singleton(
+-    Illuminate\Contracts\Debug\ExceptionHandler::class,
+-    App\Exceptions\Handler::class
+-);
+-
+-/*
+-|--------------------------------------------------------------------------
+-| Return The Application
+-|--------------------------------------------------------------------------
+-|
+-| This script returns the application instance. The instance is given to
+-| the calling script so we can separate the building of the instances
+-| from the actual running of the application and sending responses.
+-|
+-*/
+-
+-return $app;
++use Illuminate\Foundation\Application;
++use Illuminate\Foundation\Configuration\Exceptions;
++use Illuminate\Foundation\Configuration\Middleware;
++
++return Application::configure(basePath: dirname(__DIR__))
++    ->withRouting(
++        web: __DIR__.'/../routes/web.php',
++        api: __DIR__.'/../routes/api.php',
++        commands: __DIR__.'/../routes/console.php',
++        health: '/up',
++    )
++    ->withMiddleware(function (Middleware $middleware): void {
++        $middleware->append(\App\Http\Middleware\OpfsHeaders::class);
++    })
++    ->withExceptions(function (Exceptions $exceptions): void {
++        //
++    })->create();
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\config\\app.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\config\\app.php"
+index 9207160..423eed5 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\config\\app.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\config\\app.php"
+@@ -1,8 +1,5 @@
+ <?php
+ 
+-use Illuminate\Support\Facades\Facade;
+-use Illuminate\Support\ServiceProvider;
+-
+ return [
+ 
+     /*
+@@ -10,9 +7,9 @@ return [
+     | Application Name
+     |--------------------------------------------------------------------------
+     |
+-    | This value is the name of your application. This value is used when the
++    | This value is the name of your application, which will be used when the
+     | framework needs to place the application's name in a notification or
+-    | any other location as required by the application or its packages.
++    | other UI elements where an application name needs to be displayed.
+     |
+     */
+ 
+@@ -51,22 +48,20 @@ return [
+     |
+     | This URL is used by the console to properly generate URLs when using
+     | the Artisan command line tool. You should set this to the root of
+-    | your application so that it is used when running Artisan tasks.
++    | the application so that it's available within Artisan commands.
+     |
+     */
+ 
+     'url' => env('APP_URL', 'http://localhost'),
+ 
+-    'asset_url' => env('ASSET_URL'),
+-
+     /*
+     |--------------------------------------------------------------------------
+     | Application Timezone
+     |--------------------------------------------------------------------------
+     |
+     | Here you may specify the default timezone for your application, which
+-    | will be used by the PHP date and date-time functions. We have gone
+-    | ahead and set this to a sensible default for you out of the box.
++    | will be used by the PHP date and date-time functions. The timezone
++    | is set to "UTC" by default as it is suitable for most use cases.
+     |
+     */
+ 
+@@ -78,53 +73,37 @@ return [
+     |--------------------------------------------------------------------------
+     |
+     | The application locale determines the default locale that will be used
+-    | by the translation service provider. You are free to set this value
+-    | to any of the locales which will be supported by the application.
+-    |
+-    */
+-
+-    'locale' => 'en',
+-
+-    /*
+-    |--------------------------------------------------------------------------
+-    | Application Fallback Locale
+-    |--------------------------------------------------------------------------
+-    |
+-    | The fallback locale determines the locale to use when the current one
+-    | is not available. You may change the value to correspond to any of
+-    | the language folders that are provided through your application.
++    | by Laravel's translation / localization methods. This option can be
++    | set to any locale for which you plan to have translation strings.
+     |
+     */
+ 
+-    'fallback_locale' => 'en',
++    'locale' => env('APP_LOCALE', 'en'),
+ 
+-    /*
+-    |--------------------------------------------------------------------------
+-    | Faker Locale
+-    |--------------------------------------------------------------------------
+-    |
+-    | This locale will be used by the Faker PHP library when generating fake
+-    | data for your database seeds. For example, this will be used to get
+-    | localized telephone numbers, street address information and more.
+-    |
+-    */
++    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+ 
+-    'faker_locale' => 'en_US',
++    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+ 
+     /*
+     |--------------------------------------------------------------------------
+     | Encryption Key
+     |--------------------------------------------------------------------------
+     |
+-    | This key is used by the Illuminate encrypter service and should be set
+-    | to a random, 32 character string, otherwise these encrypted strings
+-    | will not be safe. Please do this before deploying an application!
++    | This key is utilized by Laravel's encryption services and should be set
++    | to a random, 32 character string to ensure that all encrypted values
++    | are secure. You should do this prior to deploying the application.
+     |
+     */
+ 
++    'cipher' => 'AES-256-CBC',
++
+     'key' => env('APP_KEY'),
+ 
+-    'cipher' => 'AES-256-CBC',
++    'previous_keys' => [
++        ...array_filter(
++            explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
++        ),
++    ],
+ 
+     /*
+     |--------------------------------------------------------------------------
+@@ -140,49 +119,8 @@ return [
+     */
+ 
+     'maintenance' => [
+-        'driver' => 'file',
+-        // 'store' => 'redis',
++        'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
++        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+     ],
+ 
+-    /*
+-    |--------------------------------------------------------------------------
+-    | Autoloaded Service Providers
+-    |--------------------------------------------------------------------------
+-    |
+-    | The service providers listed here will be automatically loaded on the
+-    | request to your application. Feel free to add your own services to
+-    | this array to grant expanded functionality to your applications.
+-    |
+-    */
+-
+-    'providers' => ServiceProvider::defaultProviders()->merge([
+-        /*
+-         * Package Service Providers...
+-         */
+-
+-        /*
+-         * Application Service Providers...
+-         */
+-        App\Providers\AppServiceProvider::class,
+-        App\Providers\AuthServiceProvider::class,
+-        // App\Providers\BroadcastServiceProvider::class,
+-        App\Providers\EventServiceProvider::class,
+-        App\Providers\RouteServiceProvider::class,
+-    ])->toArray(),
+-
+-    /*
+-    |--------------------------------------------------------------------------
+-    | Class Aliases
+-    |--------------------------------------------------------------------------
+-    |
+-    | This array of class aliases will be registered when this application
+-    | is started. However, feel free to register as many as you wish as
+-    | the aliases are "lazy" loaded so they don't hinder performance.
+-    |
+-    */
+-
+-    'aliases' => Facade::defaultAliases()->merge([
+-        // 'Example' => App\Facades\Example::class,
+-    ])->toArray(),
+-
+ ];
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\public\\index.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\public\\index.php"
+index 1d69f3a..ee8f07e 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\public\\index.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\public\\index.php"
+@@ -1,55 +1,20 @@
+ <?php
+ 
+-use Illuminate\Contracts\Http\Kernel;
++use Illuminate\Foundation\Application;
+ use Illuminate\Http\Request;
+ 
+ define('LARAVEL_START', microtime(true));
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Check If The Application Is Under Maintenance
+-|--------------------------------------------------------------------------
+-|
+-| If the application is in maintenance / demo mode via the "down" command
+-| we will load this file so that any pre-rendered content can be shown
+-| instead of starting the framework, which could cause an exception.
+-|
+-*/
+-
++// Determine if the application is in maintenance mode...
+ if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
+     require $maintenance;
+ }
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Register The Auto Loader
+-|--------------------------------------------------------------------------
+-|
+-| Composer provides a convenient, automatically generated class loader for
+-| this application. We just need to utilize it! We'll simply require it
+-| into the script here so we don't need to manually load our classes.
+-|
+-*/
+-
++// Register the Composer autoloader...
+ require __DIR__.'/../vendor/autoload.php';
+ 
+-/*
+-|--------------------------------------------------------------------------
+-| Run The Application
+-|--------------------------------------------------------------------------
+-|
+-| Once we have the application, we can handle the incoming request using
+-| the application's HTTP kernel. Then, we will send the response back
+-| to this client's browser, allowing them to enjoy our application.
+-|
+-*/
+-
++// Bootstrap Laravel and handle the request...
++/** @var Application $app */
+ $app = require_once __DIR__.'/../bootstrap/app.php';
+ 
+-$kernel = $app->make(Kernel::class);
+-
+-$response = $kernel->handle(
+-    $request = Request::capture()
+-)->send();
+-
+-$kernel->terminate($request, $response);
++$app->handleRequest(Request::capture());
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\resources\\js\\app.js" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\resources\\js\\app.js"
+index 01611ca..e59d6a0 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\resources\\js\\app.js"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\resources\\js\\app.js"
+@@ -1,65 +1 @@
+-/**
+- * First we will load all of this project's JavaScript dependencies which
+- * includes Vue and other libraries. It is a great starting point when
+- * building robust, powerful web applications using Vue and Laravel.
+- */
+-
+ import './bootstrap';
+-import { createApp } from 'vue';
+-import Dexie from 'dexie';
+-import alumnos from './components/AlumnoComponent.vue';
+-import buscar_alumnos from './components/BusquedaAlumnoComponent.vue';
+-import materias from './components/MateriaComponent.vue';
+-import buscar_materias from './components/BusquedaMateriaComponent.vue';
+-import docentes from './components/DocenteComponent.vue';
+-import buscar_docentes from './components/BusquedaDocenteComponent.vue';
+-import { vDraggable } from './draggable';
+-
+-window.db = new Dexie('db_academica');
+-
+-createApp({
+-    components: {
+-        alumnos,
+-        buscar_alumnos,
+-        materias,
+-        buscar_materias,
+-        docentes,
+-        buscar_docentes
+-    },
+-    data(){
+-        return{
+-            forms:{
+-                alumnos:{mostrar:false},
+-                buscar_alumnos:{mostrar:false},
+-
+-                materias:{mostrar:false},
+-                buscar_materias:{mostrar:false},
+-
+-                docentes:{mostrar:false},
+-                buscar_docentes:{mostrar:false},
+-
+-                matriculas:{mostrar:false},
+-                inscripciones:{mostrar:false}
+-            }
+-        };
+-    },
+-    methods:{
+-        buscar(ventana, metodo){
+-            this.$refs[ventana][metodo]();
+-        },
+-        abrirVentana(ventana){
+-            console.log(ventana);
+-            this.forms[ventana].mostrar = !this.forms[ventana].mostrar;
+-        },
+-        modificar(ventana, metodo, data){
+-            this.$refs[ventana][metodo](data);
+-        }
+-    },
+-    created(){
+-        db.version(1).stores({
+-            alumnos:'idAlumno, codigo, nombre, direccion, email, telefono',
+-            materias:'idMateria, codigo, nombre, uv',
+-            docentes:'idDocente, codigo, nombre, direccion, email, telefono, escalafon',
+-        });
+-    }
+-}).directive('draggable', vDraggable).mount('#appSistema');
+\ No newline at end of file
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\resources\\views\\welcome.blade.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\resources\\views\\welcome.blade.php"
+index 919d62e..bc8eda8 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\resources\\views\\welcome.blade.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\resources\\views\\welcome.blade.php"
+@@ -1,52 +1,75 @@
+-<!DOCTYPE html>
+-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+-    <head>
+-        <meta charset="utf-8">
+-        <meta name="viewport" content="width=device-width, initial-scale=1">
+-
+-        <title>::. Sistema Academico ..::</title>
+-
+-        <!-- Fonts -->
+-        <link rel="preconnect" href="https://fonts.bunny.net">
+-       <!-- CSS -->
+-        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css"/>
+-        <!-- Default theme -->
+-        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/default.min.css"/>
+-        <!-- Semantic UI theme -->
+-        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/semantic.min.css"/>
+-        <!-- Bootstrap theme -->
+-        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/themes/bootstrap.min.css"/>
+-        <link rel="stylesheet"href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"/>
+-    </head>
+-    <body class="antialiased">
+-        <div id="appSistema">
+-            <nav class="navbar navbar-expand-lg bg-light">
+-                <div class="container-fluid">
+-                    <a class="navbar-brand" href="#">::.. SISTEMA ACADEMICO ..::</a>
+-                    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+-                        <div class="navbar-nav">
+-                            <a class="nav-link" href="#" @click="abrirVentana('alumnos')">Alumnos</a>
+-                            <a class="nav-link" href="#" @click="abrirVentana('materias')">Materias</a>
+-                            <a class="nav-link" href="#" @click="abrirVentana('docentes')">Docentes</a>
+-                            <a class="nav-link" href="#" @click="abrirVentana('matriculas')">Matriculas</a>
+-                            <a class="nav-link" href="#" @click="abrirVentana('inscripciones')">Inscripciones</a>
+-                            <a class="nav-link" href="#" @click="hacerBackup()">Backup</a>
+-                        </div>
++<!doctype html>
++<html lang="es">
++<head>
++    <meta charset="UTF-8" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>::.. SISTEMA ACADEMICO LARAVEL ..::</title>
++    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" />
++    <link rel="stylesheet" href="{{ asset('vendor/alertifyjs/build/css/alertify.min.css') }}"/>
++    <!-- Default theme -->
++    <link rel="stylesheet" href="{{ asset('vendor/alertifyjs/build/css/themes/default.min.css') }}"/>
++    <!-- Semantic UI theme -->
++    <link rel="stylesheet" href="{{ asset('vendor/alertifyjs/build/css/themes/semantic.min.css') }}"/>
++</head>
++<body>
++    <div id="app">
++        <nav class="navbar navbar-expand-lg bg-light">
++            <div class="container-fluid">
++                <a class="navbar-brand" href="#">::.. SISTEMA ACADEMICO LARAVEL ..::</a>
++                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
++                    <div class="navbar-nav">
++                        <a class="nav-link" href="#" @click="abrirVentana('alumnos')">Alumnos</a>
++                        <a class="nav-link" href="#" @click="abrirVentana('materias')">Materias</a>
++                        <a class="nav-link" href="#" @click="abrirVentana('docentes')">Docentes</a>
++                        <a class="nav-link" href="#" @click="abrirVentana('matriculas')">Matriculas</a>
++                        <a class="nav-link" href="#" @click="abrirVentana('inscripciones')">Inscripciones</a>
++                        <a class="nav-link" href="#" @click="hacerBackup()">Backup</a>
+                     </div>
+                 </div>
+-            </nav>
+-            <div class="container-fluid" style="position: absolute; min-height: 80vh;">
+-                <alumnos @buscar='buscar("buscar_alumnos","obtenerAlumnos")' :forms="forms" ref="alumnos" v-show="forms.alumnos.mostrar"></alumnos>
+-                <buscar_alumnos @modificar='modificar("alumnos","modificarAlumno", $event)' :forms="forms" ref="buscar_alumnos" v-show="forms.buscar_alumnos.mostrar"></buscar_alumnos>
++            </div>
++        </nav>
++        <div id="appSistema" class="container-fluid" style="position: absolute; min-height: 80vh;">
++            <alumnos @buscar='buscar("busqueda_alumnos","obtenerAlumnos")' :forms="forms" ref="alumnos" v-show="forms.alumnos.mostrar"></alumnos>
++            <buscar_alumnos @modificar='modificar("alumnos","modificarAlumno", $event)' :forms="forms" ref="busqueda_alumnos" v-show="forms.busqueda_alumnos.mostrar"></buscar_alumnos>
+ 
+-                <materias @buscar='buscar("buscar_materias","obtenerMaterias")' :forms="forms" ref="materias" v-show="forms.materias.mostrar"></materias>
+-                <buscar_materias @modificar='modificar("materias","modificarMateria", $event)' :forms="forms" ref="buscar_materias" v-show="forms.buscar_materias.mostrar"></buscar_materias>
++            <materias @buscar='buscar("busqueda_materias","obtenerMaterias")' :forms="forms" ref="materias" v-show="forms.materias.mostrar"></materias>
++            <buscar_materias @modificar='modificar("materias","modificarMateria", $event)' :forms="forms" ref="busqueda_materias" v-show="forms.busqueda_materias.mostrar"></buscar_materias>
+ 
+-                <docentes @buscar='buscar("buscar_docentes","obtenerDocentes")' :forms="forms" ref="docentes" v-show="forms.docentes.mostrar"></docentes>
+-                <buscar_docentes @modificar='modificar("docentes","modificarDocente", $event)' :forms="forms" ref="buscar_docentes" v-show="forms.buscar_docentes.mostrar"></buscar_docentes>
+-            </div>
++            <docentes @buscar='buscar("busqueda_docentes","obtenerDocentes")' :forms="forms" ref="docentes" v-show="forms.docentes.mostrar"></docentes>
++            <buscar_docentes @modificar='modificar("docentes","modificarDocente", $event)' :forms="forms" ref="busqueda_docentes" v-show="forms.busqueda_docentes.mostrar"></buscar_docentes>
++            
++            <matriculas @buscar='buscar("busqueda_matriculas","obtenerMatriculas")' :forms="forms" ref="matriculas" v-show="forms.matriculas.mostrar"></matriculas>
++            <buscar_matriculas @modificar='modificar("matriculas","modificarMatricula", $event)' :forms="forms" ref="busqueda_matriculas" v-show="forms.busqueda_matriculas.mostrar"></buscar_matriculas>
++
++            <inscripciones @buscar='buscar("busqueda_inscripciones","obtenerInscripciones")' :forms="forms" ref="inscripciones" v-show="forms.inscripciones.mostrar"></inscripciones>
++            <buscar_inscripciones @modificar='modificar("inscripciones","modificarInscripcion", $event)' :forms="forms" ref="busqueda_inscripciones" v-show="forms.busqueda_inscripciones.mostrar"></buscar_inscripciones>
+         </div>
++    </div>
++    
++    <script>
++        // Provide asset url to the frontend
++        window.assetBaseUrl = "{{ asset('') }}";
++    </script>
++    <script src="{{ asset('vendor/alertifyjs/build/alertify.min.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('vendor/vue.global.prod.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('vendor/sqlite3-wasm/dist/sqlite-wasm-3510300/jswasm/sqlite3-worker1-promiser.js') }}?v=sqlite-opfs-2"></script>
++    
++    <script src="{{ asset('db/sqlite-db.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('directivas/draggable.js') }}?v=sqlite-opfs-2"></script>
++    
++    <script src="{{ asset('componentes/alumnos.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/busqueda_alumnos.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/materias.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/busqueda_materias.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/docentes.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/busqueda_docentes.js') }}?v=sqlite-opfs-2"></script>
++    
++    <script src="{{ asset('componentes/matriculas.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/busqueda_matriculas.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/inscripciones.js') }}?v=sqlite-opfs-2"></script>
++    <script src="{{ asset('componentes/busqueda_inscripciones.js') }}?v=sqlite-opfs-2"></script>
+ 
+-        @vite('resources/js/app.js')
+-    </body>
++    <script src="{{ asset('main.js') }}?v=sqlite-opfs-2"></script>
++</body>
+ </html>
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\routes\\web.php" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\routes\\web.php"
+index 277e614..86a06c5 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\routes\\web.php"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\routes\\web.php"
+@@ -1,42 +1,7 @@
+ <?php
+ 
+ use Illuminate\Support\Facades\Route;
+-use App\Http\Controllers\AlumnoController;
+-use App\Http\Controllers\MateriaController;
+-use App\Http\Controllers\DocenteController;
+-
+-/*
+-|--------------------------------------------------------------------------
+-| Web Routes
+-|--------------------------------------------------------------------------
+-|
+-| Here is where you can register web routes for your application. These
+-| routes are loaded by the RouteServiceProvider and all of them will
+-| be assigned to the "web" middleware group. Make something great!
+-|
+-*/
+ 
+ Route::get('/', function () {
+     return view('welcome');
+ });
+-Route::get('/bienvenida/{nombre}', function ($nombre) {
+-    return '<h1>Bienvenido a mi pagina, hola '.$nombre.', como estas...</h1>';
+-});
+-Route::controller(AlumnoController::class)->group(function () {
+-    Route::get('/alumno', 'index');
+-    Route::post('/alumno', 'store');
+-    Route::put('/alumno', 'update');
+-    Route::delete('/alumno', 'destroy');    
+-});
+-Route::controller(MateriaController::class)->group(function () {
+-    Route::get('/materia', 'index');
+-    Route::post('/materia', 'store');
+-    Route::put('/materia', 'update');
+-    Route::delete('/materia', 'destroy');    
+-});
+-Route::controller(DocenteController::class)->group(function () {
+-    Route::get('/docente', 'index');
+-    Route::post('/docente', 'store');
+-    Route::put('/docente', 'update');
+-    Route::delete('/docente', 'destroy');    
+-});
+\ No newline at end of file
+diff --git "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\server\\server.js" "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\server\\server.js"
+index 370b822..23a4acc 100644
+--- "a/C:\\Users\\maxr1\\OneDrive\\Desktop\\copia\\PrograIV-Semi-2026\\academica\\server\\server.js"
++++ "b/C:\\Users\\maxr1\\OneDrive\\Desktop\\antig\\PrograIV-semi-2026\\academica\\server\\server.js"
+@@ -1,27 +1,41 @@
+-var http = require('http').Server(),
+-    io = require('socket.io')(http),
+-    {MongoClient, ObjectId} = require('mongodb'),
+-    url = 'mongodb://localhost:27017',
+-    client = new MongoClient(url),
+-    dbname = 'chats_ugb';
++const express = require('express');
++const app = express();
++const http = require('http').Server(app);
++const io = require('socket.io')(http);
++const { MongoClient, ObjectId } = require("mongodb");
+ 
+-const crypto = require('crypto');
+-global.crypto = crypto.webcrypto;
++const url = "mongodb://localhost:27017";
++const client = new MongoClient(url);
++const dbname = "chats_ugb";
+ 
+-async function conectarMongo(){
++async function conectarMongo() {
+     await client.connect();
+     return client.db(dbname);
+ }
+ 
++app.get('/', (req, res) => {
++  res.sendFile(__dirname + '/index.html');
++});
++
+ io.on('connect', (socket) => {
+     console.log('Un usuario se ha conectado');
+ 
+     socket.on('mensajeRecibido', async (data) => {
+-        let db = await conectarMongo(),
+-            collection = db.collection('chats'),
+-            result = collection.insertOne({user:data.titulo, mensaje:data.mensaje, fecha:new Date()});
+-        io.emit('mensajeEnviar', data);
+-    })
++        try {
++            let db = await conectarMongo();
++            let collection = db.collection('chats'); // Corregido: "coleccion" a "collection"
++            let result = await collection.insertOne({ 
++                titulo: data.titulo, 
++                mensaje: data.mensaje, 
++                fecha: new Date() 
++            });
++            console.log('Mensaje guardado en Mongo:', result.insertedId);
++            io.emit('mensajeEnviar', data);
++        } catch(e) {
++            console.error('Error Mongo:', e);
++        }
++    });
++
+ });
+ 
+ http.listen(3000, () => {
